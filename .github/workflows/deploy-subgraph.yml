@@ -63,6 +63,5 @@ jobs:
           git push
 
       - name: Deploy Subgraph
-        run:
-          yarn graph deploy --node http://194.35.12.206:8020/
-          collection/subgraph
+        run: |
+          echo "v1" | yarn graph deploy --node http://194.35.12.206:8020/ collection/subgraph
