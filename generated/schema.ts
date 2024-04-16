@@ -6,7 +6,6 @@ import {
   Value,
   ValueKind,
   store,
-  Address,
   Bytes,
   BigInt,
   BigDecimal
@@ -20,22 +19,31 @@ export class Token extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Token entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Token entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Token", id.toString(), this);
+    assert(id != null, "Cannot save Token entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Token must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Token", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Token | null {
+    return changetype<Token | null>(store.get_in_block("Token", id));
   }
 
   static load(id: string): Token | null {
-    return store.get("Token", id) as Token | null;
+    return changetype<Token | null>(store.get("Token", id));
   }
 
   get id(): string {
     let value = this.get("id");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -44,7 +52,7 @@ export class Token extends Entity {
 
   get owner(): string | null {
     let value = this.get("owner");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -52,16 +60,16 @@ export class Token extends Entity {
   }
 
   set owner(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("owner");
     } else {
-      this.set("owner", Value.fromString(value as string));
+      this.set("owner", Value.fromString(<string>value));
     }
   }
 
   get uri(): string | null {
     let value = this.get("uri");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -69,25 +77,20 @@ export class Token extends Entity {
   }
 
   set uri(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("uri");
     } else {
-      this.set("uri", Value.fromString(value as string));
+      this.set("uri", Value.fromString(<string>value));
     }
   }
 
-  get transfers(): Array<string> {
-    let value = this.get("transfers");
-    return value.toStringArray();
-  }
-
-  set transfers(value: Array<string>) {
-    this.set("transfers", Value.fromStringArray(value));
+  get transfers(): TransferLoader {
+    return new TransferLoader("Token", this.get("id")!.toString(), "transfers");
   }
 
   get contract(): string | null {
     let value = this.get("contract");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -95,10 +98,10 @@ export class Token extends Entity {
   }
 
   set contract(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("contract");
     } else {
-      this.set("contract", Value.fromString(value as string));
+      this.set("contract", Value.fromString(<string>value));
     }
   }
 }
@@ -111,52 +114,52 @@ export class Owner extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Owner entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Owner entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Owner", id.toString(), this);
+    assert(id != null, "Cannot save Owner entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Owner must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Owner", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Owner | null {
+    return changetype<Owner | null>(store.get_in_block("Owner", id));
   }
 
   static load(id: string): Owner | null {
-    return store.get("Owner", id) as Owner | null;
+    return changetype<Owner | null>(store.get("Owner", id));
   }
 
   get id(): string {
     let value = this.get("id");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
   }
 
-  get ownedTokens(): Array<string> {
-    let value = this.get("ownedTokens");
-    return value.toStringArray();
+  get ownedTokens(): TokenLoader {
+    return new TokenLoader("Owner", this.get("id")!.toString(), "ownedTokens");
   }
 
-  set ownedTokens(value: Array<string>) {
-    this.set("ownedTokens", Value.fromStringArray(value));
-  }
-
-  get balance(): BigInt | null {
+  get balance(): BigInt {
     let value = this.get("balance");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
     } else {
       return value.toBigInt();
     }
   }
 
-  set balance(value: BigInt | null) {
-    if (value === null) {
-      this.unset("balance");
-    } else {
-      this.set("balance", Value.fromBigInt(value as BigInt));
-    }
+  set balance(value: BigInt) {
+    this.set("balance", Value.fromBigInt(value));
   }
 }
 
@@ -168,22 +171,31 @@ export class Contract extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Contract entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Contract entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Contract", id.toString(), this);
+    assert(id != null, "Cannot save Contract entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Contract must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Contract", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Contract | null {
+    return changetype<Contract | null>(store.get_in_block("Contract", id));
   }
 
   static load(id: string): Contract | null {
-    return store.get("Contract", id) as Contract | null;
+    return changetype<Contract | null>(store.get("Contract", id));
   }
 
   get id(): string {
     let value = this.get("id");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -192,7 +204,7 @@ export class Contract extends Entity {
 
   get name(): string | null {
     let value = this.get("name");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -200,16 +212,16 @@ export class Contract extends Entity {
   }
 
   set name(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("name");
     } else {
-      this.set("name", Value.fromString(value as string));
+      this.set("name", Value.fromString(<string>value));
     }
   }
 
   get symbol(): string | null {
     let value = this.get("symbol");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -217,16 +229,16 @@ export class Contract extends Entity {
   }
 
   set symbol(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("symbol");
     } else {
-      this.set("symbol", Value.fromString(value as string));
+      this.set("symbol", Value.fromString(<string>value));
     }
   }
 
   get totalSupply(): BigInt | null {
     let value = this.get("totalSupply");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toBigInt();
@@ -234,20 +246,19 @@ export class Contract extends Entity {
   }
 
   set totalSupply(value: BigInt | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("totalSupply");
     } else {
-      this.set("totalSupply", Value.fromBigInt(value as BigInt));
+      this.set("totalSupply", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get mintedTokens(): Array<string> {
-    let value = this.get("mintedTokens");
-    return value.toStringArray();
-  }
-
-  set mintedTokens(value: Array<string>) {
-    this.set("mintedTokens", Value.fromStringArray(value));
+  get mintedTokens(): TokenLoader {
+    return new TokenLoader(
+      "Contract",
+      this.get("id")!.toString(),
+      "mintedTokens"
+    );
   }
 }
 
@@ -259,22 +270,31 @@ export class Transfer extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Transfer entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Transfer entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Transfer", id.toString(), this);
+    assert(id != null, "Cannot save Transfer entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Transfer must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Transfer", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): Transfer | null {
+    return changetype<Transfer | null>(store.get_in_block("Transfer", id));
   }
 
   static load(id: string): Transfer | null {
-    return store.get("Transfer", id) as Transfer | null;
+    return changetype<Transfer | null>(store.get("Transfer", id));
   }
 
   get id(): string {
     let value = this.get("id");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set id(value: string) {
@@ -283,7 +303,11 @@ export class Transfer extends Entity {
 
   get token(): string {
     let value = this.get("token");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set token(value: string) {
@@ -292,7 +316,7 @@ export class Transfer extends Entity {
 
   get from(): string | null {
     let value = this.get("from");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -300,16 +324,16 @@ export class Transfer extends Entity {
   }
 
   set from(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("from");
     } else {
-      this.set("from", Value.fromString(value as string));
+      this.set("from", Value.fromString(<string>value));
     }
   }
 
   get to(): string | null {
     let value = this.get("to");
-    if (value === null || value.kind == ValueKind.NULL) {
+    if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
       return value.toString();
@@ -317,16 +341,20 @@ export class Transfer extends Entity {
   }
 
   set to(value: string | null) {
-    if (value === null) {
+    if (!value) {
       this.unset("to");
     } else {
-      this.set("to", Value.fromString(value as string));
+      this.set("to", Value.fromString(<string>value));
     }
   }
 
   get timestamp(): BigInt {
     let value = this.get("timestamp");
-    return value.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set timestamp(value: BigInt) {
@@ -335,7 +363,11 @@ export class Transfer extends Entity {
 
   get block(): BigInt {
     let value = this.get("block");
-    return value.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set block(value: BigInt) {
@@ -344,10 +376,50 @@ export class Transfer extends Entity {
 
   get transactionHash(): string {
     let value = this.get("transactionHash");
-    return value.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
   }
 
   set transactionHash(value: string) {
     this.set("transactionHash", Value.fromString(value));
+  }
+}
+
+export class TransferLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Transfer[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Transfer[]>(value);
+  }
+}
+
+export class TokenLoader extends Entity {
+  _entity: string;
+  _field: string;
+  _id: string;
+
+  constructor(entity: string, id: string, field: string) {
+    super();
+    this._entity = entity;
+    this._id = id;
+    this._field = field;
+  }
+
+  load(): Token[] {
+    let value = store.loadRelated(this._entity, this._id, this._field);
+    return changetype<Token[]>(value);
   }
 }

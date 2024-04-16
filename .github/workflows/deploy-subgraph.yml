@@ -1,0 +1,68 @@
+name: Deploy Subgraph
+
+on:
+  workflow_dispatch:
+    inputs:
+      contractName:
+        description: 'Name of the new contract'
+        required: true
+      contractAddress:
+        description: 'Address of the new contract'
+        required: true
+      startBlock:
+        description: 'Start block for the new contract'
+        required: true
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Update subgraph.yaml
+        run: |
+          echo "  - kind: ethereum/contract" >> subgraph.yaml
+          echo "    name: ${{ github.event.inputs.contractName }}" >> subgraph.yaml
+          echo "    network: mainnet" >> subgraph.yaml
+          echo "    source:" >> subgraph.yaml
+          echo "      address: '${{ github.event.inputs.contractAddress }}'" >> subgraph.yaml
+          echo "      abi: ERC721" >> subgraph.yaml
+          echo "      startBlock: ${{ github.event.inputs.startBlock }}" >> subgraph.yaml
+          echo "    mapping:" >> subgraph.yaml
+          echo "      kind: ethereum/events" >> subgraph.yaml
+          echo "      apiVersion: 0.0.7" >> subgraph.yaml
+          echo "      language: wasm/assemblyscript" >> subgraph.yaml
+          echo "      entities:" >> subgraph.yaml
+          echo "        - Token" >> subgraph.yaml
+          echo "        - Owner" >> subgraph.yaml
+          echo "        - Contract" >> subgraph.yaml
+          echo "        - Transfer" >> subgraph.yaml
+          echo "      abis:" >> subgraph.yaml
+          echo "        - name: ERC721" >> subgraph.yaml
+          echo "          file: ./abis/ERC721.json" >> subgraph.yaml
+          echo "      eventHandlers:" >> subgraph.yaml
+          echo "        - event: Transfer(indexed address,indexed address,indexed uint256)" >> subgraph.yaml
+          echo "          handler: handleTransfer" >> subgraph.yaml
+          echo "      file: ./src/mapping.ts" >> subgraph.yaml
+
+      - name: Commit and push if there's changes
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add subgraph.yaml
+          git commit -m "Update subgraph.yaml with new contract" || exit 0
+          git push
+
+      - name: Deploy Subgraph
+        run:
+          yarn graph deploy --node http://194.35.12.206:8020/
+          collection/subgraph

@@ -1,5 +1,8 @@
 import { log, BigInt } from '@graphprotocol/graph-ts';
-import { ERC721, Transfer as TransferEvent } from '../generated/ERC721/ERC721';
+import {
+  ERC721,
+  Transfer as TransferEvent,
+} from '../generated/Defichain Punks Reloaded/ERC721';
 import { Token, Owner, Contract, Transfer } from '../generated/schema';
 
 export function handleTransfer(event: TransferEvent): void {
@@ -26,7 +29,7 @@ export function handleTransfer(event: TransferEvent): void {
   } else {
     let prevBalance = previousOwner.balance;
     if (prevBalance > BigInt.fromI32(0)) {
-      previousOwner.balance = prevBalance - BigInt.fromI32(1);
+      previousOwner.balance = prevBalance.minus(BigInt.fromI32(1));
     }
   }
 
@@ -35,7 +38,7 @@ export function handleTransfer(event: TransferEvent): void {
     newOwner.balance = BigInt.fromI32(1);
   } else {
     let prevBalance = newOwner.balance;
-    newOwner.balance = prevBalance + BigInt.fromI32(1);
+    newOwner.balance = prevBalance.plus(BigInt.fromI32(1));
   }
 
   if (token == null) {
