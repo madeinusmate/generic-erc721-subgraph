@@ -142,7 +142,7 @@ dataSources:
           handler: handleTransfer
       file: ./src/mapping.ts
   - kind: ethereum/contract
-    name: DUSD Bond 1 Year
+    name: Dusd Bond 1 Year
     network: mainnet
     source:
       address: '0x4554FB6C7a5bF6e1750Dfa48663599013E47106f'
