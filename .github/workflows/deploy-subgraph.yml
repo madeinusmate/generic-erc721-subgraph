@@ -28,6 +28,11 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Debug before command
+        run: |
+          echo "Running curl command to fetch deployment ID and block number"
+          env | sort
+
       - name: Retrieve and log deployment ID
         run: |
           DEPLOYMENT_RESULT=$(curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ _meta { deployment block { number } } }" }' http://194.35.12.206:8000/subgraphs/name/nfts/subgraph)
@@ -40,6 +45,10 @@ jobs:
             echo "Deployment ID: $DEPLOYMENT_ID"
           fi
         shell: bash
+
+      - name: Debug after command
+        run: |
+          echo "Completed curl command"
 
       - name: Update subgraph.yaml with grafting propertu
         run: |
