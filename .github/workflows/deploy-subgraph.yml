@@ -28,7 +28,35 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Update subgraph.yaml
+      - name: Retrieve and log deployment ID
+        run: |
+          DEPLOYMENT_RESULT=$(curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ _meta { deployment block { number } } }" }' http://194.35.12.206:8000/subgraphs/name/nfts/subgraph)
+          DEPLOYMENT_ID=$(echo $DEPLOYMENT_RESULT | jq -r '._meta.deployment')
+          BLOCK_NUMBER=$(echo $DEPLOYMENT_RESULT | jq -r '._meta.block.number')
+          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" == "null" ]; then
+            echo "Failed to retrieve the deployment ID."
+            exit 1
+          else
+            echo "Deployment ID: $DEPLOYMENT_ID"
+          fi
+        shell: bash
+
+      - name: Update subgraph.yaml with grafting propertu
+        run: |
+          if grep -q "graft:" subgraph.yaml; then
+            echo "Graft property exists. Updating..."
+            sed -i '/graft:/,$d' subgraph.yaml
+            echo "graft:" >> subgraph.yaml
+            echo "  base: $DEPLOYMENT_ID" >> subgraph.yaml
+            echo "  block: $BLOCK_NUMBER" >> subgraph.yaml
+          else
+            echo "Graft property does not exist. Adding..."
+            echo "graft:" >> subgraph.yaml
+            echo "  base: $DEPLOYMENT_ID" >> subgraph.yaml
+            echo "  block: $BLOCK_NUMBER" >> subgraph.yaml
+          fi
+
+      - name: Update subgraph.yaml with new contract
         run: |
           echo "  - kind: ethereum/contract" >> subgraph.yaml
           echo "    name: ${{ github.event.inputs.contractName }}" >> subgraph.yaml

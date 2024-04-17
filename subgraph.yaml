@@ -1,3 +1,5 @@
+features:
+  - grafting
 specVersion: 0.0.5
 description: Generic ERC721 Subgraph (Transfers, Metadata)
 schema:
@@ -194,6 +196,29 @@ dataSources:
       address: '0x56CcbE268D3D59cE46489d7fd58853399d5569a4'
       abi: ERC721
       startBlock: 196951
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Owner
+        - Contract
+        - Transfer
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: DUSD Pride
+    network: mainnet
+    source:
+      address: '0xa4af4427cF96522C1aAFdE42e4F72c3e8fa99424'
+      abi: ERC721
+      startBlock: 148660
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
