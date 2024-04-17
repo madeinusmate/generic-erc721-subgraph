@@ -33,21 +33,17 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+    
+      - name: Install yq
+        run: sudo snap install yq
+      
 
-      - name: Update subgraph.yaml with grafting property
+      - name: Update subgraph.yaml with grafting property using yq
         run: |
-          if grep -q "graft:" subgraph.yaml; then
-            echo "Graft property exists. Updating..."
-            sed -i '/graft:/,$d' subgraph.yaml
-            echo "graft:" >> subgraph.yaml
-            echo "  base: ${{ github.event.inputs.subgraphId }}" >> subgraph.yaml
-            echo "  block: ${{ github.event.inputs.currentBlockNumber }}" >> subgraph.yaml
-          else
-            echo "Graft property does not exist. Adding..."
-            echo "graft:" >> subgraph.yaml
-            echo "  base: ${{ github.event.inputs.subgraphId }}" >> subgraph.yaml
-            echo "  block: ${{ github.event.inputs.currentBlockNumber }}" >> subgraph.yaml
-          fi
+          yq eval '.graft.base = strenv(SUBGRAPH_ID) | .graft.block = strenv(BLOCK_NUMBER)' subgraph.yaml -i
+        env:
+          SUBGRAPH_ID: ${{ github.event.inputs.subgraphId }}
+          BLOCK_NUMBER: ${{ github.event.inputs.currentBlockNumber }}
 
       - name: Update subgraph.yaml with new contract
         run: |
