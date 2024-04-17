@@ -66,18 +66,18 @@ jobs:
           git commit -m "Update subgraph.yaml with new contract" || exit 0
           git push
 
-          - name: Deploy Subgraph
-          run: |
-            retry_count=0
-            max_retries=5
-            delay_between_retries=10 # seconds
-            until yarn graph deploy --node http://194.35.12.206:8020/ nfts/subgraph --version-label v1.0.0; do
-              retry_count=$((retry_count+1))
-              echo "Deployment failed. Attempt $retry_count/$max_retries will retry in $delay_between_retries seconds..."
-              if [ "$retry_count" -ge "$max_retries" ]; then
-                echo "Deployment failed after $max_retries attempts."
-                exit 1
-              fi
-              sleep $delay_between_retries
-            done
-            echo "Deployment succeeded."
+      - name: Deploy Subgraph
+        run: |
+          retry_count=0
+          max_retries=5
+          delay_between_retries=10 # seconds
+          until yarn graph deploy --node http://194.35.12.206:8020/ nfts/subgraph --version-label v1.0.0; do
+            retry_count=$((retry_count+1))
+            echo "Deployment failed. Attempt $retry_count/$max_retries will retry in $delay_between_retries seconds..."
+            if [ "$retry_count" -ge "$max_retries" ]; then
+              echo "Deployment failed after $max_retries attempts."
+              exit 1
+            fi
+            sleep $delay_between_retries
+          done
+          echo "Deployment succeeded."
