@@ -54,6 +54,10 @@ jobs:
           echo "          handler: handleTransfer" >> subgraph.yaml
           echo "      file: ./src/mapping.ts" >> subgraph.yaml
 
+      - name: codegen Subgraph
+        run: |
+          yarn graph codegen
+
       - name: Commit and push if there's changes
         run: |
           git config --global user.email "action@github.com"
@@ -62,6 +66,14 @@ jobs:
           git commit -m "Update subgraph.yaml with new contract" || exit 0
           git push
 
+      - name: Remove current Subgraph
+        run: |
+          yarn graph remove --node http://194.35.12.206:8020/ nfts/subgraph
+
+      - name: Create Subgraph
+        run: |
+          yarn graph create --node http://194.35.12.206:8020/ nfts/subgraph
+
       - name: Deploy Subgraph
         run: |
-          yarn graph deploy --node http://194.35.12.206:8020/ collection/subgraph --version-label v1.0.0
+          yarn graph deploy --node http://194.35.12.206:8020/ nfts/subgraph --version-label v1.0.0
