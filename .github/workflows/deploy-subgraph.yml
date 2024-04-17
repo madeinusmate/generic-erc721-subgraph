@@ -12,6 +12,12 @@ on:
       startBlock:
         description: 'Start block for the new contract'
         required: true
+      subgraphId:
+        description: 'The current SubgraphID for grafting'
+        required: true
+      currentBlockNumber:
+        description: 'The current Subgraph block height for grafting'
+        required: true
 
 jobs:
   update-and-deploy:
@@ -28,29 +34,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Debug before command
-        run: |
-          echo "Running curl command to fetch deployment ID and block number"
-          env | sort
-
-      - name: Retrieve and log deployment ID
-        run: |
-          DEPLOYMENT_RESULT=$(curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ _meta { deployment block { number } } }" }' http://194.35.12.206:8000/subgraphs/name/nfts/subgraph)
-          DEPLOYMENT_ID=$(echo $DEPLOYMENT_RESULT | jq -r '._meta.deployment')
-          BLOCK_NUMBER=$(echo $DEPLOYMENT_RESULT | jq -r '._meta.block.number')
-          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" == "null" ]; then
-            echo "Failed to retrieve the deployment ID."
-            exit 1
-          else
-            echo "Deployment ID: $DEPLOYMENT_ID"
-          fi
-        shell: bash
-
-      - name: Debug after command
-        run: |
-          echo "Completed curl command"
-
-      - name: Update subgraph.yaml with grafting propertu
+      - name: Update subgraph.yaml with grafting property
         run: |
           if grep -q "graft:" subgraph.yaml; then
             echo "Graft property exists. Updating..."
