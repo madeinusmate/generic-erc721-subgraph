@@ -40,7 +40,7 @@ jobs:
 
       - name: Update subgraph.yaml with grafting property using yq
         run: |
-          yq eval '.graft.base = strenv(SUBGRAPH_ID) | .graft.block = strenv(BLOCK_NUMBER)' subgraph.yaml -i
+          yq eval '.graft.base = strenv(SUBGRAPH_ID) | .graft.block = strenv(BLOCK_NUMBER) | tonumber' subgraph.yaml -i
         env:
           SUBGRAPH_ID: ${{ github.event.inputs.subgraphId }}
           BLOCK_NUMBER: ${{ github.event.inputs.currentBlockNumber }}
