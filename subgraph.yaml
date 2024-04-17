@@ -1,5 +1,8 @@
 features:
   - grafting
+graft:
+  base: 'subgraphId'
+  block: 12345
 specVersion: 0.0.5
 description: Generic ERC721 Subgraph (Transfers, Metadata)
 schema:
