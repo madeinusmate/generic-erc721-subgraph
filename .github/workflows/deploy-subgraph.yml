@@ -40,13 +40,13 @@ jobs:
             echo "Graft property exists. Updating..."
             sed -i '/graft:/,$d' subgraph.yaml
             echo "graft:" >> subgraph.yaml
-            echo "  base: $DEPLOYMENT_ID" >> subgraph.yaml
-            echo "  block: $BLOCK_NUMBER" >> subgraph.yaml
+            echo "  base: ${{ github.event.inputs.subgraphId }}" >> subgraph.yaml
+            echo "  block: ${{ github.event.inputs.currentBlockNumber }}" >> subgraph.yaml
           else
             echo "Graft property does not exist. Adding..."
             echo "graft:" >> subgraph.yaml
-            echo "  base: $DEPLOYMENT_ID" >> subgraph.yaml
-            echo "  block: $BLOCK_NUMBER" >> subgraph.yaml
+            echo "  base: ${{ github.event.inputs.subgraphId }}" >> subgraph.yaml
+            echo "  block: ${{ github.event.inputs.currentBlockNumber }}" >> subgraph.yaml
           fi
 
       - name: Update subgraph.yaml with new contract
