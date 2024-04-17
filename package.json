@@ -7,7 +7,7 @@
     "build": "graph build",
     "create-vps": "graph create --node http://194.35.12.206:8020/ collection/subgraph",
     "remove-vps": "graph remove --node http://194.35.12.206:8020/ collection/subgraph",
-    "deploy-vps": "graph deploy --node http://194.35.12.206:8020/ collection/subgraph"
+    "deploy-vps": "graph deploy --node http://194.35.12.206:8020/ collection/subgraph --version-label v1.0.0"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "^0.31.0"

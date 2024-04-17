@@ -64,10 +64,4 @@ jobs:
 
       - name: Deploy Subgraph
         run: |
-          sudo apt-get install expect
-          expect -c '
-          spawn yarn graph deploy --node http://194.35.12.206:8020/ collection/subgraph
-          expect "Which version label to use? (e.g. \"v0.0.1\"):"
-          send "v1\r"
-          interact
-          '
+          yarn graph deploy --node http://194.35.12.206:8020/ collection/subgraph --version-label v1.0.0
