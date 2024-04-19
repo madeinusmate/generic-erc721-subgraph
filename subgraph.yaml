@@ -1,5 +1,0 @@
-specVersion: 0.0.5
-description: Generic ERC721 Subgraph (Transfers, Metadata)
-schema:
-  file: ./schema.graphql
-dataSources:
