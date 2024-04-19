@@ -66,6 +66,10 @@ jobs:
       - name: Deploy Subgraph
         run: |
           yarn graph codegen
+      
+      - name: Deploy Subgraph
+        run: |
+          yarn graph create --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph
             
 
       - name: Deploy Subgraph
