@@ -65,6 +65,7 @@ jobs:
       
       - name: Archive subgraph.yaml
         run: |
+          mkdir -p archive
           if [ -f subgraph.yaml ]; then
             CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
             mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
