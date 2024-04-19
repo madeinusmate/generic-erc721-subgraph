@@ -62,7 +62,11 @@ jobs:
                 file: ./src/mapping.ts
           EOF
       
-          
+
+      - name: Deploy Subgraph
+        run: |
+          yarn graph codegen
+            
 
       - name: Deploy Subgraph
         run: |
