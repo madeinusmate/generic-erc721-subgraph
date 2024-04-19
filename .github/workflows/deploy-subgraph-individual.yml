@@ -28,15 +28,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Archive current subgraph.yaml
-        run: |
-          mkdir -p archive
-          if [ -f subgraph.yaml ]; then
-            # Extract the contract address from subgraph.yaml
-            CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
-            # Use the extracted address to rename and move the file
-            mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
-          fi
 
       - name: Create new subgraph.yaml
         run: |
@@ -70,6 +61,14 @@ jobs:
                     handler: handleTransfer
                 file: ./src/mapping.ts
           EOF
+      
+      
+      - name: Archive subgraph.yaml
+        run: |
+          if [ -f subgraph.yaml ]; then
+            CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
+            mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
+          fi
 
       - name: Commit and push if there's changes
         run: |
@@ -81,4 +80,4 @@ jobs:
 
       - name: Deploy Subgraph
         run: |
-          yarn graph deploy --node http://194.35.12.206:8020/ nfts/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+          yarn graph deploy --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0

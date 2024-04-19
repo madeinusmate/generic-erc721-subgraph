@@ -24,6 +24,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   if (previousOwner == null) {
     previousOwner = new Owner(event.params.from.toHexString());
+    previousOwner.address = event.params.from.toHexString();
 
     previousOwner.balance = BigInt.fromI32(0);
   } else {
@@ -35,6 +36,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   if (newOwner == null) {
     newOwner = new Owner(event.params.to.toHexString());
+    newOwner.address = event.params.to.toHexString();
     newOwner.balance = BigInt.fromI32(1);
   } else {
     let prevBalance = newOwner.balance;
@@ -44,7 +46,7 @@ export function handleTransfer(event: TransferEvent): void {
   if (token == null) {
     token = new Token(event.params.tokenId.toHexString());
     token.contract = event.address.toHexString();
-
+    token.tokenId = event.params.tokenId;
     let uri = instance.try_tokenURI(event.params.tokenId);
     if (!uri.reverted) {
       token.uri = uri.value;
@@ -65,6 +67,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   if (contract == null) {
     contract = new Contract(event.address.toHexString());
+    contract.address = event.address.toHexString();
   }
 
   let name = instance.try_name();
