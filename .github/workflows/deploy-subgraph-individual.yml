@@ -62,7 +62,13 @@ jobs:
                 file: ./src/mapping.ts
           EOF
       
-      
+          
+
+      - name: Deploy Subgraph
+        run: |
+          yarn graph deploy --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+
+
       - name: Archive subgraph.yaml
         run: |
           mkdir -p archive
@@ -78,7 +84,3 @@ jobs:
           git add .
           git commit -m "Update subgraph.yaml with new contract" || exit 0
           git push
-
-      - name: Deploy Subgraph
-        run: |
-          yarn graph deploy --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
