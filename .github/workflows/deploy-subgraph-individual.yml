@@ -75,7 +75,7 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git add subgraph.yaml
+          git add .
           git commit -m "Update subgraph.yaml with new contract" || exit 0
           git push
 
