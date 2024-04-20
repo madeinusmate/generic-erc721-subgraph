@@ -1,0 +1,28 @@
+specVersion: 0.0.5
+description: Generic ERC721 Subgraph (Transfers, Metadata)
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Support Re-Peg by Krypto Wölfe
+    network: mainnet
+    source:
+      address: '0xA1dE3b7De17e641661b9Dc825A3e0698CEFC44CA'
+      abi: ERC721
+      startBlock: 307420
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Owner
+        - Contract
+        - Transfer
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
