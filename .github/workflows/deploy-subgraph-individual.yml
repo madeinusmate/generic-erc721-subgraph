@@ -24,7 +24,7 @@ jobs:
 
       - name: Create new subgraph.yaml
         run: |
-          SUBGRAPHS_JSON="${{ github.event.inputs.subgraphs }}"
+          SUBGRAPHS_JSON='${{ github.event.inputs.subgraphs }}'
           echo "Deploying subgraphs: $SUBGRAPHS_JSON"
           echo $SUBGRAPHS_JSON | jq -c '.[]' | while read i; do
             CONTRACT_NAME=$(echo $i | jq -r '.contractName')
