@@ -27,58 +27,61 @@ jobs:
           SUBGRAPHS_JSON="${{ github.event.inputs.subgraphs }}"
           echo "Deploying subgraphs: $SUBGRAPHS_JSON"
           echo $SUBGRAPHS_JSON | jq -c '.[]' | while read i; do
-            CONTRACT_NAME=$(echo $i | jq -r '.contractName')
-            CONTRACT_ADDRESS=$(echo $i | jq -r '.contractAddress')
-            START_BLOCK=$(echo $i | jq -r '.startBlock')
+            CONTRACT_NAME=$(echo $i | jq -r '.name')
+            CONTRACT_ADDRESS=$(echo $i | jq -r '.address')
+            START_BLOCK=$(echo $i | jq -r '.block')
             
-            cat > subgraph.yaml <<SUBGRAPH_YAML
-            specVersion: 0.0.5
-            description: Generic ERC721 Subgraph (Transfers, Metadata)
-            schema:
-              file: ./schema.graphql
-            dataSources:
-              - kind: ethereum/contract
-                name: $CONTRACT_NAME
-                network: mainnet
-                source:
-                  address: '$CONTRACT_ADDRESS'
-                  abi: ERC721
-                  startBlock: $START_BLOCK
-                mapping:
-                  kind: ethereum/events
-                  apiVersion: 0.0.7
-                  language: wasm/assemblyscript
-                  entities:
-                    - Token
-                    - Owner
-                    - Contract
-                    - Transfer
-                  abis:
-                    - name: ERC721
-                      file: ./abis/ERC721.json
-                  eventHandlers:
-                    - event: Transfer(indexed address,indexed address,indexed uint256)
-                      handler: handleTransfer
-                  file: ./src/mapping.ts
-          SUBGRAPH_YAML
+          echo "Contract Name: $CONTRACT_NAME"
+          echo "Contract Address: $CONTRACT_ADDRESS"
+          echo "Start Block: $START_BLOCK"
+      #       cat > subgraph.yaml <<SUBGRAPH_YAML
+      #       specVersion: 0.0.5
+      #       description: Generic ERC721 Subgraph (Transfers, Metadata)
+      #       schema:
+      #         file: ./schema.graphql
+      #       dataSources:
+      #         - kind: ethereum/contract
+      #           name: $CONTRACT_NAME
+      #           network: mainnet
+      #           source:
+      #             address: '$CONTRACT_ADDRESS'
+      #             abi: ERC721
+      #             startBlock: $START_BLOCK
+      #           mapping:
+      #             kind: ethereum/events
+      #             apiVersion: 0.0.7
+      #             language: wasm/assemblyscript
+      #             entities:
+      #               - Token
+      #               - Owner
+      #               - Contract
+      #               - Transfer
+      #             abis:
+      #               - name: ERC721
+      #                 file: ./abis/ERC721.json
+      #             eventHandlers:
+      #               - event: Transfer(indexed address,indexed address,indexed uint256)
+      #                 handler: handleTransfer
+      #             file: ./src/mapping.ts
+      #     SUBGRAPH_YAML
         
-            yarn graph codegen
+      #       yarn graph codegen
         
-            yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
+      #       yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
         
-            yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+      #       yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
         
-            mkdir -p archive
-            if [ -f subgraph.yaml ]; then
-              CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
-              mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
-            fi
-          done
+      #       mkdir -p archive
+      #       if [ -f subgraph.yaml ]; then
+      #         CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
+      #         mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
+      #       fi
+      #     done
 
-      - name: Commit and push if there's changes
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add .
-          git commit -m "Update subgraph.yaml with new contract" || exit 0
-          git push
+      # - name: Commit and push if there's changes
+      #   run: |
+      #     git config --global user.email "action@github.com"
+      #     git config --global user.name "GitHub Action"
+      #     git add .
+      #     git commit -m "Update subgraph.yaml with new contract" || exit 0
+      #     git push
