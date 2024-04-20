@@ -24,7 +24,7 @@ jobs:
 
       - name: Create new subgraph.yaml
         run: |
-          IFS=',' read -r -a subgraph_array <<< "${{ github.event.inputs.subgraphs }}"
+          IFS=',' read -r -a subgraph_array <<< '${{ github.event.inputs.subgraphs }}'
           for subgraph in "${subgraph_array[@]}"
           do
             IFS=';' read -r CONTRACT_NAME CONTRACT_ADDRESS START_BLOCK <<< "$subgraph"
