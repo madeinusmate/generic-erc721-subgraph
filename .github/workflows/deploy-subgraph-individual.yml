@@ -24,16 +24,43 @@ jobs:
 
       - name: Create new subgraph.yaml
         run: |
-          SUBGRAPHS_JSON="${{ github.event.inputs.subgraphs }}"
-          echo "Deploying subgraphs: $SUBGRAPHS_JSON"
-          echo $SUBGRAPHS_JSON | jq -c '.[]' | while read i; do
-            CONTRACT_NAME=$(echo $i | jq -r '.name')
-            CONTRACT_ADDRESS=$(echo $i | jq -r '.address')
-            START_BLOCK=$(echo $i | jq -r '.block')
+          IFS=',' read -r -a subgraph_array <<< "${{ github.event.inputs.subgraphs }}"
+          for subgraph in "${subgraph_array[@]}"
+          do
+            IFS=';' read -r CONTRACT_NAME CONTRACT_ADDRESS START_BLOCK <<< "$subgraph"
+            cat >> subgraph.yaml <<SUBGRAPH_YAML
+            specVersion: 0.0.5
+            description: Generated Subgraph for $CONTRACT_NAME
+            schema:
+              file: ./schema.graphql
+            dataSources:
+              - kind: ethereum/contract
+                name: $CONTRACT_NAME
+                network: mainnet
+                source:
+                  address: '$CONTRACT_ADDRESS'
+                  abi: ERC721
+                  startBlock: $START_BLOCK
+                mapping:
+                  kind: ethereum/events
+                  apiVersion: 0.0.7
+                  language: wasm/assemblyscript
+                  entities:
+                    - Token
+                    - Owner
+                    - Contract
+                    - Transfer
+                  abis:
+                    - name: ERC721
+                      file: ./abis/ERC721.json
+                  eventHandlers:
+                    - event: Transfer(indexed address,indexed address,indexed uint256)
+                      handler: handleTransfer
+                  file: ./src/mapping.ts
+            SUBGRAPH_YAML
+          done
             
-          echo "Contract Name: $CONTRACT_NAME"
-          echo "Contract Address: $CONTRACT_ADDRESS"
-          echo "Start Block: $START_BLOCK"
+       
       #       cat > subgraph.yaml <<SUBGRAPH_YAML
       #       specVersion: 0.0.5
       #       description: Generic ERC721 Subgraph (Transfers, Metadata)
