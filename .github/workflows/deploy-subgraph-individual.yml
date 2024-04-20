@@ -31,6 +31,10 @@ jobs:
             CONTRACT_ADDRESS=$(echo $i | jq -r '.contractAddress')
             START_BLOCK=$(echo $i | jq -r '.startBlock')
 
+            echo "Debug - CONTRACT_NAME: $CONTRACT_NAME"
+            echo "Debug - CONTRACT_ADDRESS: $CONTRACT_ADDRESS"
+            echo "Debug - START_BLOCK: $START_BLOCK"
+
             cat >> subgraph.yaml <<SUBGRAPH_YAML
             specVersion: 0.0.5
             description: Generated Subgraph for $CONTRACT_NAME
