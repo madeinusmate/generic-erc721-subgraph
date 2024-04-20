@@ -32,42 +32,42 @@ jobs:
             CONTRACT_ADDRESS=$(echo $i | jq -r '.contractAddress')
             START_BLOCK=$(echo $i | jq -r '.startBlock')
             
-          cat > subgraph.yaml <<EOF
-          specVersion: 0.0.5
-          description: Generic ERC721 Subgraph (Transfers, Metadata)
-          schema:
-            file: ./schema.graphql
-          dataSources:
-            - kind: ethereum/contract
-              name: $CONTRACT_NAME
-              network: mainnet
-              source:
-                address: '$CONTRACT_ADDRESS'
-                abi: ERC721
-                startBlock: $START_BLOCK
-              mapping:
-                kind: ethereum/events
-                apiVersion: 0.0.7
-                language: wasm/assemblyscript
-                entities:
-                  - Token
-                  - Owner
-                  - Contract
-                  - Transfer
-                abis:
-                  - name: ERC721
-                    file: ./abis/ERC721.json
-                eventHandlers:
-                  - event: Transfer(indexed address,indexed address,indexed uint256)
-                    handler: handleTransfer
-                file: ./src/mapping.ts
-          EOF
+            cat > subgraph.yaml <<EOF
+            specVersion: 0.0.5
+            description: Generic ERC721 Subgraph (Transfers, Metadata)
+            schema:
+              file: ./schema.graphql
+            dataSources:
+              - kind: ethereum/contract
+                name: $CONTRACT_NAME
+                network: mainnet
+                source:
+                  address: '$CONTRACT_ADDRESS'
+                  abi: ERC721
+                  startBlock: $START_BLOCK
+                mapping:
+                  kind: ethereum/events
+                  apiVersion: 0.0.7
+                  language: wasm/assemblyscript
+                  entities:
+                    - Token
+                    - Owner
+                    - Contract
+                    - Transfer
+                  abis:
+                    - name: ERC721
+                      file: ./abis/ERC721.json
+                  eventHandlers:
+                    - event: Transfer(indexed address,indexed address,indexed uint256)
+                      handler: handleTransfer
+                  file: ./src/mapping.ts
+            EOF
 
-          yarn graph codegen
+            yarn graph codegen
 
-          yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
+            yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
 
-          yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+            yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
 
           mkdir -p archive
           if [ -f subgraph.yaml ]; then
