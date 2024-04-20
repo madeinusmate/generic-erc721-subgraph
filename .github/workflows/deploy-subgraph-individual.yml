@@ -31,7 +31,7 @@ jobs:
             CONTRACT_ADDRESS=$(echo $i | jq -r '.contractAddress')
             START_BLOCK=$(echo $i | jq -r '.startBlock')
             
-            cat > subgraph.yaml <<EOF
+            cat > subgraph.yaml <<SUBGRAPH_YAML
             specVersion: 0.0.5
             description: Generic ERC721 Subgraph (Transfers, Metadata)
             schema:
@@ -60,7 +60,7 @@ jobs:
                     - event: Transfer(indexed address,indexed address,indexed uint256)
                       handler: handleTransfer
                   file: ./src/mapping.ts
-            EOF
+                  SUBGRAPH_YAML
         
             yarn graph codegen
         
