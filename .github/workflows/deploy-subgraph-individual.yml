@@ -3,8 +3,14 @@ name: Deploy Subgraph - Individual
 on:
   workflow_dispatch:
     inputs:
-      subgraphs:
-        description: 'Array of subgraphs'
+      contractName:
+        description: 'Name of the new contract'
+        required: true
+      contractAddress:
+        description: 'Address of the new contract'
+        required: true
+      startBlock:
+        description: 'Start block for the new contract'
         required: true
 
 jobs:
@@ -22,63 +28,62 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+
       - name: Create new subgraph.yaml
         run: |
-          SUBGRAPHS_JSON='${{ github.event.inputs.subgraphs }}'
-          echo "Deploying subgraphs: $SUBGRAPHS_JSON"
-          echo $SUBGRAPHS_JSON | jq -c '.[]' | while read i; do
-            CONTRACT_NAME=$(echo $i | jq -r '.name')
-            CONTRACT_ADDRESS=$(echo $i | jq -r '.address')
-            START_BLOCK=$(echo $i | jq -r '.block')
+          cat > subgraph.yaml <<EOF
+          specVersion: 0.0.5
+          description: Generic ERC721 Subgraph (Transfers, Metadata)
+          schema:
+            file: ./schema.graphql
+          dataSources:
+            - kind: ethereum/contract
+              name: ${{ github.event.inputs.contractName }}
+              network: mainnet
+              source:
+                address: '${{ github.event.inputs.contractAddress }}'
+                abi: ERC721
+                startBlock: ${{ github.event.inputs.startBlock }}
+              mapping:
+                kind: ethereum/events
+                apiVersion: 0.0.7
+                language: wasm/assemblyscript
+                entities:
+                  - Token
+                  - Owner
+                  - Contract
+                  - Transfer
+                abis:
+                  - name: ERC721
+                    file: ./abis/ERC721.json
+                eventHandlers:
+                  - event: Transfer(indexed address,indexed address,indexed uint256)
+                    handler: handleTransfer
+                file: ./src/mapping.ts
+          EOF
+      
 
-            echo "Debug - CONTRACT_NAME: $CONTRACT_NAME"
-            echo "Debug - CONTRACT_ADDRESS: $CONTRACT_ADDRESS"
-            echo "Debug - START_BLOCK: $START_BLOCK"
-
-            cat >> subgraph.yaml <<SUBGRAPH_YAML
-            specVersion: 0.0.5
-            description: Generated Subgraph for $CONTRACT_NAME
-            schema:
-              file: ./schema.graphql
-            dataSources:
-              - kind: ethereum/contract
-                name: $CONTRACT_NAME
-                network: mainnet
-                source:
-                  address: '$CONTRACT_ADDRESS'
-                  abi: ERC721
-                  startBlock: $START_BLOCK
-                mapping:
-                  kind: ethereum/events
-                  apiVersion: 0.0.7
-                  language: wasm/assemblyscript
-                  entities:
-                    - Token
-                    - Owner
-                    - Contract
-                    - Transfer
-                  abis:
-                    - name: ERC721
-                      file: ./abis/ERC721.json
-                  eventHandlers:
-                    - event: Transfer(indexed address,indexed address,indexed uint256)
-                      handler: handleTransfer
-                  file: ./src/mapping.ts
-          SUBGRAPH_YAML
-                    
-        
+      - name: Deploy Subgraph
+        run: |
           yarn graph codegen
       
-          yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
-      
-          yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
-      
+      - name: Deploy Subgraph
+        run: |
+          yarn graph create --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph
+            
+
+      - name: Deploy Subgraph
+        run: |
+          yarn graph deploy --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+
+
+      - name: Archive subgraph.yaml
+        run: |
           mkdir -p archive
           if [ -f subgraph.yaml ]; then
             CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
             mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
           fi
-          done
 
       - name: Commit and push if there's changes
         run: |
