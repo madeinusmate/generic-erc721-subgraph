@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       subgraphs:
-        description: 'JSON string of subgraphs to deploy'
+        description: 'Array of subgraphs'
         required: true
-
+      
 jobs:
   update-and-deploy:
     runs-on: ubuntu-latest
@@ -22,7 +22,8 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Deploy Subgraphs
+
+      - name: Create new subgraph.yaml
         run: |
           SUBGRAPHS_JSON="${{ github.event.inputs.subgraphs }}"
           echo "Deploying subgraphs: $SUBGRAPHS_JSON"
@@ -31,7 +32,6 @@ jobs:
             CONTRACT_ADDRESS=$(echo $i | jq -r '.contractAddress')
             START_BLOCK=$(echo $i | jq -r '.startBlock')
             
-          # Create subgraph.yaml for each subgraph
           cat > subgraph.yaml <<EOF
           specVersion: 0.0.5
           description: Generic ERC721 Subgraph (Transfers, Metadata)
@@ -61,27 +61,24 @@ jobs:
                   - event: Transfer(indexed address,indexed address,indexed uint256)
                     handler: handleTransfer
                 file: ./src/mapping.ts
-          EOF 
-            
-          # Deploy each subgraph
+          EOF
+
           yarn graph codegen
+
           yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
+
           yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
-        
-          # Archive each subgraph
 
           mkdir -p archive
           if [ -f subgraph.yaml ]; then
             CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
             mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
           fi
-          done
-         
-
+      
       - name: Commit and push if there's changes
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add .
-          git commit -m "Update subgraph.yaml with new contracts" || exit 0
+          git commit -m "Update subgraph.yaml with new contract" || exit 0
           git push
