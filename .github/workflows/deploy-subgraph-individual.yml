@@ -61,7 +61,7 @@ jobs:
                     - event: Transfer(indexed address,indexed address,indexed uint256)
                       handler: handleTransfer
                   file: ./src/mapping.ts
-            EOF
+                  EOF
 
             yarn graph codegen
 
