@@ -1,0 +1,28 @@
+specVersion: 0.0.5
+description: Generic ERC721 Subgraph (Transfers, Metadata)
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: CryptoOctos
+    network: mainnet
+    source:
+      address: '0xe64cBF0C36A726937da2BFC65A09485CA3BD45B5'
+      abi: ERC721
+      startBlock: 28176
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Owner
+        - Contract
+        - Transfer
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
