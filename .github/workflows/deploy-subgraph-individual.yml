@@ -6,7 +6,7 @@ on:
       subgraphs:
         description: 'Array of subgraphs'
         required: true
-      
+
 jobs:
   update-and-deploy:
     runs-on: ubuntu-latest
@@ -21,7 +21,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
-
 
       - name: Create new subgraph.yaml
         run: |
@@ -60,21 +59,22 @@ jobs:
                   eventHandlers:
                     - event: Transfer(indexed address,indexed address,indexed uint256)
                       handler: handleTransfer
-                  file: ./src/mapping.ts EOF
-                  
-
+                  file: ./src/mapping.ts
+            EOF
+        
             yarn graph codegen
-
+        
             yarn graph create --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph
-
+        
             yarn graph deploy --node http://194.35.12.206:8020/ $CONTRACT_ADDRESS/subgraph --ipfs http://194.35.12.206:5001 --version-label v1.0.0
+        
+            mkdir -p archive
+            if [ -f subgraph.yaml ]; then
+              CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
+              mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
+            fi
+          done
 
-          mkdir -p archive
-          if [ -f subgraph.yaml ]; then
-            CONTRACT_ADDRESS=$(grep 'address:' subgraph.yaml | head -n 1 | awk '{print $2}' | tr -d "'")
-            mv subgraph.yaml archive/${CONTRACT_ADDRESS}.yaml
-          fi
-      
       - name: Commit and push if there's changes
         run: |
           git config --global user.email "action@github.com"
