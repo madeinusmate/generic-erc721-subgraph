@@ -63,11 +63,11 @@ jobs:
           EOF
       
 
-      - name: Deploy Subgraph
+      - name: Codegen Subgraph
         run: |
           yarn graph codegen
       
-      - name: Deploy Subgraph
+      - name: Create Subgraph
         run: |
           yarn graph create --node http://194.35.12.206:8020/ ${{ github.event.inputs.contractAddress }}/subgraph
             

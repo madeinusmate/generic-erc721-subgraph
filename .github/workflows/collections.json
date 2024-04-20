@@ -1,12 +1,12 @@
 [
   {
     "name": "Defichain Punks Original",
-    "address": "0xd1D833DcbB28E7b38DC90661c1DfF1F20E88fD37",
+    "address": "0xd1d833dcbb28e7b38dc90661c1dff1f20e88fd37",
     "block": "82490"
   },
   {
     "name": "Defichain Punks Reloaded",
-    "address": "0x8947469101E11218606CCDC8E837b6B28818cB22",
+    "address": "0x8947469101e11218606ccdc8e837b6b28818cb22",
     "block": "82490"
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "name": "DUSD Pride",
-    "address": "0xa4af4427cF96522C1aAFdE42e4F72c3e8fa99424",
+    "address": "0xa4af4427cf96522c1aafde42e4f72c3e8fa99424",
     "block": "147230"
   },
   {
@@ -36,7 +36,7 @@
   },
   {
     "name": "The 43 lost DUSD NFTs",
-    "address": "0x84DD82a0574b8F3444c2b57b0C3C911fFA21bF63",
+    "address": "0x84dd82a0574b8f3444c2b57b0c3c911ffa21bf63",
     "block": "142867"
   },
   {
@@ -51,7 +51,7 @@
   },
   {
     "name": "Homage to Kuegi",
-    "address": "0x544C36b13C7543eEE0a1260955Ae7F40684a2448",
+    "address": "0x544c36b13c7543eee0a1260955ae7f40684a2448",
     "block": "285638"
   },
   {
