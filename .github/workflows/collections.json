@@ -22,13 +22,14 @@
   {
     "name": "DUSD Pride",
     "address": "0xa4af4427cf96522c1aafde42e4f72c3e8fa99424",
-    "block": "147230"
+    "block": "146230"
   },
   {
     "name": "VanillaSwap V3 Positions NFTs",
     "address": "0x274567c3b27f3981c4ae7c951ecde1c2ae70e6d0",
     "block": "147230"
   },
+
   {
     "name": "Atlantis Genesis Trident",
     "address": "0xdb479ce8841174680e398a3b81a36c87c3cddc47",
@@ -116,7 +117,7 @@
   },
   {
     "name": "Defichain Art Workshop Figures",
-    "address": "0x1c2c37e707259c2a4aa370bd6c45d9dada19091",
+    "address": "0x1c2c37e707259c2a4aa370bd6c45d9daada19091",
     "block": "345114"
   },
   {

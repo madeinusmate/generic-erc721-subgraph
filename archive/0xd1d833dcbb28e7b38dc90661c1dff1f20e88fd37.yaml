@@ -7,9 +7,9 @@ dataSources:
     name: Defichain Punks Original
     network: mainnet
     source:
-      address: '0xd1d833dcbb28e7b38dc90661c1dff1f20e88fd37'
+      address: '0xd1D833DcbB28E7b38DC90661c1DfF1F20E88fD37'
       abi: ERC721
-      startBlock: 82448
+      startBlock: 82490
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
