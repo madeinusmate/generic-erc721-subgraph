@@ -1,0 +1,28 @@
+specVersion: 0.0.5
+description: Generic ERC721 Subgraph (Transfers, Metadata)
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Jellyverse Archives
+    network: mainnet
+    source:
+      address: '0x79f1c77dc1f1f3f117f40cb3c8b42e4e33f4f7e9'
+      abi: ERC721
+      startBlock: 307941
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Owner
+        - Contract
+        - Transfer
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
